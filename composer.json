@@ -1,0 +1,40 @@
+{
+    "name": "parallelogram-dev/img-alt",
+    "description": "A CraftCMS plugin to allow automated alt tag generation for uploaded images, using OpenAI",
+    "type": "craft-plugin",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Parallelogram",
+            "homepage": "https://parallelogram.com.au"
+        }
+    ],
+    "support": {
+        "email": "support@parallelogram.com.au",
+        "issues": "https://github.com/parallelogram-dev/img-alt/issues?state=open",
+        "source": "https://github.com/parallelogram-dev/img-alt",
+        "docs": "https://github.com/parallelogram-dev/img-alt"
+    },
+    "require": {
+        "php": "^8.2",
+        "craftcms/cms": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "parallelogram\\imgalt\\": "src/"
+        }
+    },
+    "extra": {
+        "craft": {
+            "name": "Img Alt",
+            "handle": "img-alt",
+            "class": "parallelogram\\imgalt\\ImgAlt"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}
