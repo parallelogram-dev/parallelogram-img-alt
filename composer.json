@@ -17,7 +17,7 @@
     },
     "require": {
         "php": "^8.2",
-        "craftcms/cms": "^5.0"
+        "craftcms/cms": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -25,16 +25,14 @@
         }
     },
     "extra": {
-        "craft": {
-            "name": "Img Alt",
-            "handle": "imgalt",
-            "class": "parallelogram\\imgalt\\Plugin",
-            "schemaVersion": "1.0.0",
-            "changelogUrl": "https://github.com/parallelogram-dev/img-alt/releases",
-            "documentationUrl": "https://github.com/parallelogram-dev/img-alt#readme",
-            "developer": "Parallelogram",
-            "developerUrl": "https://parallelogram.com.au"
-        }
+        "name": "Img Alt",
+        "handle": "imgalt",
+        "class": "parallelogram\\imgalt\\Plugin",
+        "schemaVersion": "1.0.0",
+        "changelogUrl": "https://github.com/parallelogram-dev/imgalt/releases",
+        "documentationUrl": "https://github.com/parallelogram-dev/imgalt#readme",
+        "developer": "Parallelogram",
+        "developerUrl": "https://parallelogram.com.au"
     },
     "config": {
         "allow-plugins": {
