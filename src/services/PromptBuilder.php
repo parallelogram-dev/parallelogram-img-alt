@@ -1,17 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace parallelogram\imgalt\services;
 
 use Craft;
-use craft\base\FsInterface;
 use craft\elements\Asset;
+use craft\helpers\FileHelper;
+use craft\helpers\StringHelper;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
 
-class PromptBuilder
+final class PromptBuilder
 {
-    /** @return Settings */
-    private function settings(): Settings
+    private function s(): Settings
     {
         /** @var Settings $s */
         $s = Plugin::getInstance()->getSettings();
@@ -19,90 +20,99 @@ class PromptBuilder
         return $s;
     }
 
-    /**
-     * Build chat payload for either URL-fetch or upload-via-data-URL.
-     */
+    // Build the chat payload (unchanged apart from calling dataUrlForAssetUpload())
     public function buildPrompt(Asset $asset, array $context = []): array
     {
-        $s = $this->settings();
+        $s = $this->s();
 
-        // Build the instruction text
         $instruction = <<<PROMPT
 Write one short alt text sentence for this image, suitable for accessibility and SEO. Describe the image clearly and concisely. Do not use quotes, colons or semi-colons. Limit to 10–20 words.
 PROMPT;
 
-        // Decide how to attach the image
         if ($s->sendImageAsUpload) {
-            // Upload mode: send as data URL (base64)
             $imagePart = [
                 'type'      => 'image_url',
-                'image_url' => [
-                    'url' => $this->buildDataUrlForAsset($asset), // <-- key line
-                ],
+                'image_url' => ['url' => $this->dataUrlForAssetUpload($asset)],
             ];
         } else {
-            // URL mode: send a publicly reachable URL
-            // Prefer $asset->getUrl() (respects your FS) rather than manual concatenation
-            $publicUrl = $asset->getUrl();
-            if (! $publicUrl) {
-                // fallback if your FS isn't public; you can inject your own host if you must
-                $base      = Craft::parseEnv(getenv('DEFAULT_SITE_URL') ?: '') ?: '';
-                $publicUrl = rtrim($base, '/') . '/' . ltrim($asset->path, '/');
+            $url = $asset->getUrl([
+                'width'   => $s->transformMaxSize,
+                'height'  => $s->transformMaxSize,
+                'mode'    => $s->transformMode,
+                'quality' => $s->transformQuality,
+                'format'  => $s->transformFormat ?: null,
+            ]) ?? $asset->getUrl();
+
+            if (! $url) {
+                throw new \RuntimeException('No public URL for this asset. Enable “Send image as upload”.');
             }
+
             $imagePart = [
                 'type'      => 'image_url',
-                'image_url' => [
-                    'url' => $publicUrl,
-                ],
+                'image_url' => ['url' => $url],
             ];
         }
 
-        // Your existing OpenAI chat payload shape
         return [
             'model'       => 'gpt-4o',
-            'messages'    => [
-                [
-                    'role'    => 'user',
-                    'content' => [
-                        ['type' => 'text', 'text' => $instruction],
-                        $imagePart,
-                    ],
-                ],
-            ],
+            'messages'    => [[
+                                  'role'    => 'user',
+                                  'content' => [
+                                      ['type' => 'text', 'text' => $instruction],
+                                      $imagePart,
+                                  ],
+                              ]],
             'temperature' => 0.7,
         ];
     }
 
     /**
-     * Read the asset bytes from Craft’s filesystem and return a data URL.
-     * Example result: "data:image/jpeg;base64,AAAA..."
+     * Make a resized/encoded copy using Craft's Images service and return a data: URL.
+     * Falls back to original bytes if transforms aren't requested.
      */
-    private function buildDataUrlForAsset(Asset $asset): string
+    private function dataUrlForAssetUpload(Asset $asset): string
     {
-        $fs    = $asset->getFs();
-        $bytes = $fs->read($asset->getPath());   // string|false
+        $s = $this->s();
 
+        // 1) Read original bytes from the asset's filesystem
+        $bytes = $asset->getFs()->read($asset->getPath());
         if ($bytes === false || $bytes === null) {
-            throw new \RuntimeException("FS read failed for asset #{$asset->id}");
+            throw new \RuntimeException("Failed to read bytes for asset #{$asset->id}");
         }
 
-        $mime = $asset->getMimeType() ?: 'application/octet-stream';
+        // 2) If you resized/re-encoded to a temp file earlier, read THAT path
+        //    and set $bytes = file_get_contents($tmpPath); (then unlink)
+        //    BUT do NOT pass $bytes to finfo_file(); it's not a filename.
+
+        // 3) Decide MIME without finfo_file():
+        // Prefer transform format; else try finfo_buffer; else fall back to asset mime.
+        $mime = null;
+
+        // (a) From chosen output format (recommended)
+        $format = $s->transformFormat ?: '';
+        if ($format !== '') {
+            $mime = match (strtolower($format)) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'webp' => 'image/webp',
+                default => null,
+            };
+        }
+
+        // (b) Try finfo_buffer on the bytes (safe; no filename)
+        if ($mime === null && function_exists('finfo_open')) {
+            if ($f = finfo_open(FILEINFO_MIME_TYPE)) {
+                $det = finfo_buffer($f, $bytes) ?: null;
+                finfo_close($f);
+                if (is_string($det) && $det !== '') {
+                    $mime = $det;
+                }
+            }
+        }
+
+        // (c) Fall back to Craft's stored mime or a generic default
+        $mime ??= $asset->getMimeType() ?: 'application/octet-stream';
 
         return 'data:' . $mime . ';base64,' . base64_encode($bytes);
-    }
-
-    private function guessMime(string $bytes): ?string
-    {
-        if (! function_exists('finfo_open')) {
-            return null;
-        }
-        $f = finfo_open(FILEINFO_MIME_TYPE);
-        if (! $f) {
-            return null;
-        }
-        $mime = finfo_buffer($f, $bytes) ?: null;
-        finfo_close($f);
-
-        return $mime;
     }
 }

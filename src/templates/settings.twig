@@ -11,14 +11,6 @@
   on: settings.autoGenerateOnUpload ?? true
 }) }}
 
-{{ forms.lightswitchField({
-  label: 'Send image as upload'|t('app'),
-  instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
-  id: 'sendImageAsUpload',
-  name: 'sendImageAsUpload',
-  on: settings.sendImageAsUpload ?? false
-}) }}
-
 {{ forms.autosuggestField({
   label: 'OpenAI API Key'|t('app'),
   instructions: 'Supports plain value or an environment variable like {example}.'|t('app')|replace({'{example}':'$OPENAI_API_KEY'}),
@@ -48,4 +40,62 @@
   name: 'language',
   value: settings.language ?? 'en-AU',
   placeholder: 'en-AU'
+}) }}
+
+{{ forms.lightswitchField({
+  label: 'Send image as upload'|t('app'),
+  instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
+  id: 'sendImageAsUpload',
+  name: 'sendImageAsUpload',
+  on: settings.sendImageAsUpload ?? false
+}) }}
+
+{{ forms.textField({
+  label: 'Max dimension (px)',
+  instructions: 'Longest side of the transformed image.',
+  id: 'transformMaxSize',
+  name: 'transformMaxSize',
+  value: settings.transformMaxSize ?? 1024,
+  type: 'number',
+  min: 64,
+  max: 4096,
+  size: 6
+}) }}
+
+{{ forms.selectField({
+  label: 'Resize mode',
+  id: 'transformMode',
+  name: 'transformMode',
+  options: [
+    {label: 'Fit (preserve aspect)', value: 'fit'},
+    {label: 'Crop', value: 'crop'},
+    {label: 'Stretch', value: 'stretch'},
+  ],
+  value: settings.transformMode ?? 'fit'
+}) }}
+
+{{ forms.selectField({
+  label: 'Output format',
+  instructions: 'Choose an output format to reduce size. Leave blank to keep source format.',
+  id: 'transformFormat',
+  name: 'transformFormat',
+  options: [
+    {label: 'JPEG (jpg)', value: 'jpg'},
+    {label: 'PNG (png)', value: 'png'},
+    {label: 'WebP (webp)', value: 'webp'},
+    {label: 'Source format (unchanged)', value: ''},
+  ],
+  value: settings.transformFormat ?? 'jpg'
+}) }}
+
+{{ forms.textField({
+  label: 'Quality',
+  instructions: 'Applies to lossy formats (jpg/webp).',
+  id: 'transformQuality',
+  name: 'transformQuality',
+  value: settings.transformQuality ?? 82,
+  type: 'number',
+  min: 1,
+  max: 100,
+  size: 4
 }) }}
