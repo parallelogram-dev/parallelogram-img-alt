@@ -1,9 +1,9 @@
 <?php
-namespace parallelogram\imgalt\\\ImageAlt\console\controllers;
+namespace parallelogram\imgalt\console\controllers;
 
 use craft\console\Controller;
 use craft\elements\Asset;
-use parallelogram\imgalt\\\ImageAlt\services\AltTextService;
+use parallelogram\imgalt\services\AltTextService;
 use yii\console\ExitCode;
 
 class AltController extends Controller
@@ -12,7 +12,7 @@ class AltController extends Controller
     {
         $assets = Asset::find()
             ->volume('*')
-            ->altText(':empty:')
+            ->hasAlt(false)
             ->all();
 
         $service = new AltTextService();
@@ -25,16 +25,15 @@ class AltController extends Controller
 
                 $this->stdout("Processing asset #{$asset->id} ({$asset->filename})...\n");
 
-                if ($asset->getFieldValue('altText') !== null) {
+                if ($asset->alt !== null) {
                     $this->stderr("⚠️ Asset #{$asset->id} has an alt tag\n");
                     continue;
                 }
 
                 $caption = $service->generateForAsset($asset);
-                echo $caption;
 
                 if ($caption) {
-                    $asset->setFieldValue('altText', $caption);
+                    $asset->alt = $caption;
                     \Craft::$app->getElements()->saveElement($asset);
                     $this->stdout("✅ Alt text set: {$caption}\n");
                 } else {

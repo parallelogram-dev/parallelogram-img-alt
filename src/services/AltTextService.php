@@ -1,16 +1,25 @@
 <?php
-namespace parallelogram\imgalt\ImageAlt\services;
+namespace parallelogram\imgalt\services;
 
 use Craft;
 use craft\elements\Asset;
-use parallelogram\imgalt\ImageAlt\services\PromptBuilder;
-use parallelogram\imgalt\ImageAlt;
+use parallelogram\imgalt\services\PromptBuilder;
+use parallelogram\imgalt\Plugin;
 
 class AltTextService
 {
+    private function settings(): Settings
+    {
+        /** @var Settings $s */
+        $s = Plugin::getInstance()->getSettings();
+        return $s;
+    }
+
+
     public function generateForAsset(Asset $asset): ?string
     {
-        $contextResolver = GptAltText::getInstance()->contextResolver ?? null;
+        $contextResolver = Plugin::getInstance()->contextResolver ?? null;
+        $settings = Plugin::$plugin->getSettings();
 
         if (!$contextResolver) {
             Craft::error("Context resolver not available", __METHOD__);
@@ -23,7 +32,7 @@ class AltTextService
         try {
             $client = Craft::createGuzzleClient([
                 'headers' => [
-                    'Authorization' => 'Bearer ' . Craft::$app->config->getConfigFromFile('gpt')['apiKey'],
+                    'Authorization' => 'Bearer ' . $settings->openAiApiKey,
                     'Content-Type' => 'application/json',
                 ],
             ]);

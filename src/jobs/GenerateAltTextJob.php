@@ -1,10 +1,10 @@
 <?php
-namespace parallelogram\imgalt\\\ImageAlt\jobs;
+namespace parallelogram\imgalt\jobs;
 
 use Craft;
 use craft\elements\Asset;
 use craft\queue\BaseJob;
-use parallelogram\imgalt\\\ImageAlt\services\AltTextService;
+use parallelogram\imgalt\services\AltTextService;
 
 class GenerateAltTextJob extends BaseJob
 {
@@ -23,7 +23,7 @@ class GenerateAltTextJob extends BaseJob
         $caption = $service->generateForAsset($asset);
 
         if ($caption) {
-            $asset->setFieldValue('alt', $caption);
+            $asset->alt = $caption;
             Craft::$app->getElements()->saveElement($asset);
         } else {
             Craft::warning("Failed to generate alt text for asset ID {$this->assetId}", __METHOD__);

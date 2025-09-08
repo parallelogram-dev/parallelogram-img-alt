@@ -1,0 +1,110 @@
+<?php
+
+namespace parallelogram\imgalt;
+
+use Craft;
+use craft\base\Plugin as BasePlugin;
+use craft\elements\Asset;
+use craft\events\DefineHtmlEvent;
+use craft\events\RegisterElementActionsEvent;
+use craft\web\UrlManager;
+use parallelogram\imgalt\elements\actions\GenerateAltTextAction;
+use parallelogram\imgalt\models\Settings;
+use parallelogram\imgalt\resolvers\ContextResolverManager;
+use parallelogram\imgalt\resolvers\DefaultResolver;
+use yii\base\Event;
+
+final class Plugin extends BasePlugin
+{
+    public static Plugin          $plugin;
+    public ContextResolverManager $contextResolver;
+    public bool                   $hasCpSection  = false; // set true if you have a CP nav/section
+    public bool                   $hasCpSettings = true; // set true if you expose settings UI
+
+    public function init(): void
+    {
+        parent::init();
+        self::$plugin = $this;
+
+        Craft::setAlias('@imgalt', __DIR__);
+
+        $settings    = Plugin::$plugin->getSettings();
+        $resolverMap = [];
+
+        foreach ($config['resolverMap'] ?? [] as $type => $resolverClass) {
+            $resolverMap[$type] = new $resolverClass();
+        }
+
+        $this->contextResolver = new ContextResolverManager(
+            $resolverMap,
+            new DefaultResolver()
+        );
+
+        // Register our element action for Assets
+        Event::on(
+            Asset::class,
+            Asset::EVENT_REGISTER_ACTIONS,
+            static function (RegisterElementActionsEvent $e) {
+                $e->actions[] = GenerateAltTextAction::class;
+            }
+        );
+
+        Event::on(
+            Asset::class,
+            Asset::EVENT_DEFINE_SIDEBAR_HTML, // emitted by element types to customize sidebar
+            static function (DefineHtmlEvent $e) {
+                /** @var Asset $asset */
+                $asset = $e->sender;
+
+                $id         = 'imgalt-sidebar-' . mt_rand();
+                $buttonHtml = <<<HTML
+                    <div class="meta">
+                      <div class="field">
+                        <div class="heading"><label>Img Alt</label></div>
+                        <div class="input ltr">
+                          <button type="button" id="{$id}" class="btn">
+                            <span class="icon" data-icon="sparkles"></span>
+                            Generate ALT text
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+HTML;
+
+                $e->html .= $buttonHtml;
+
+                Craft::$app->getView()->registerJsWithVars(
+                    fn($buttonId, $assetId) => <<<JS
+                $('#'+$buttonId).on('click', async () => {
+                  try {
+                    await Craft.sendActionRequest('POST', 'imgalt/alt/generate', {data:{assetId: $assetId}});
+                    Craft.cp.displaySuccess(Craft.t('imgalt', 'Queued ALT generation.'));
+                  } catch (e) {
+                    const msg = e?.response?.data?.message ?? e?.message ?? 'Request failed';
+                    Craft.cp.displayError(msg);
+                  }
+                });
+JS,
+                    [$id, (int) $asset->id]
+                );
+            }
+        );
+
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->controllerNamespace = 'parallelogram\\imgalt\\console\\controllers';
+        }
+
+    }
+
+    protected function createSettingsModel(): ?\craft\base\Model
+    {
+        return new Settings();
+    }
+
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->getView()->renderTemplate('imgalt/settings', [
+            'settings' => $this->getSettings(),
+        ]);
+    }
+}

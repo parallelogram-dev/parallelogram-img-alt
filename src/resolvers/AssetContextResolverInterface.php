@@ -1,5 +1,5 @@
 <?php
-namespace  parallelogram\imgalt\\\ImageAlt\resolvers;
+namespace  parallelogram\imgalt\resolvers;
 
 use craft\elements\Asset;
 

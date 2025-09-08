@@ -1,0 +1,51 @@
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Img Alt — Settings' %}
+{% set fullPageForm = true %}
+
+{{ forms.lightswitchField({
+  label: 'Auto-generate on upload'|t('app'),
+  instructions: 'When enabled, the plugin will queue alt-text generation whenever an image is uploaded.'|t('app'),
+  id: 'autoGenerateOnUpload',
+  name: 'autoGenerateOnUpload',
+  on: settings.autoGenerateOnUpload ?? true
+}) }}
+
+{{ forms.lightswitchField({
+  label: 'Send image as upload'|t('app'),
+  instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
+  id: 'sendImageAsUpload',
+  name: 'sendImageAsUpload',
+  on: settings.sendImageAsUpload ?? false
+}) }}
+
+{{ forms.autosuggestField({
+  label: 'OpenAI API Key'|t('app'),
+  instructions: 'Supports plain value or an environment variable like {example}.'|t('app')|replace({'{example}':'$OPENAI_API_KEY'}),
+  id: 'openAiApiKey',
+  name: 'openAiApiKey',
+  value: settings.openAiApiKey ?? '',
+  suggestEnvVars: true,
+  placeholder: '$OPENAI_API_KEY'
+}) }}
+
+{{ forms.textField({
+  label: 'Max tokens'|t('app'),
+  instructions: 'Upper bound for a single generation request.'|t('app'),
+  id: 'maxTokens',
+  name: 'maxTokens',
+  value: settings.maxTokens ?? 256,
+  size: 5,
+  type: 'number',
+  min: 1,
+  max: 4000
+}) }}
+
+{{ forms.textField({
+  label: 'Language'|t('app'),
+  instructions: 'BCP-47 code to bias generated text (e.g. en, en-AU).'|t('app'),
+  id: 'language',
+  name: 'language',
+  value: settings.language ?? 'en-AU',
+  placeholder: 'en-AU'
+}) }}

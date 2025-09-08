@@ -1,32 +1,37 @@
 <?php
-namespace parallelogram\imgalt\\\ImageAlt\console\controllers;
 
-use craft\console\Controller;
+namespace parallelogram\imgalt\controllers;
+
+namespace parallelogram\imgalt\controllers;
+
+use Craft;
+use craft\web\Controller;
 use craft\elements\Asset;
-use parallelogram\imgalt\\\ImageAlt\AltTextService;
-use yii\console\ExitCode;
+use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 class AltController extends Controller
 {
-    public function actionGenerate(): int
+    /** Only CP users; omit/adjust if you want site access too */
+    protected array|int|bool $allowAnonymous = false;
+
+    public function actionGenerate(): Response
     {
-        $assets = Asset::find()->volume('*')->all();
-        $service = new AltTextService();
+        $this->requireCpRequest();
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
 
-        foreach ($assets as $asset) {
-            $this->stdout("Processing asset #{$asset->id} ({$asset->filename})...\n");
-
-            $caption = $service->generateForAsset($asset);
-
-            if ($caption) {
-                $asset->setFieldValue('alt', $caption);
-                \Craft::$app->getElements()->saveElement($asset);
-                $this->stdout("✅ Alt text set: {$caption}\n");
-            } else {
-                $this->stderr("⚠️ Failed to generate alt text for asset #{$asset->id}\n");
-            }
+        $assetId = (int)Craft::$app->getRequest()->getRequiredBodyParam('assetId');
+        $asset = Asset::find()->id($assetId)->one();
+        if (!$asset) {
+            throw new BadRequestHttpException("Asset not found.");
         }
 
-        return ExitCode::OK;
+        // Queue your job (or call a service)
+        Craft::$app->getQueue()->push(new \parallelogram\imgalt\jobs\GenerateAltTextJob([
+            'assetId' => $assetId,
+        ]));
+
+        return $this->asSuccess(Craft::t('imgalt', 'Queued ALT generation.'));
     }
 }

@@ -1,9 +1,9 @@
 <?php
-namespace parallelogram\imgalt\\\ImageAlt\resolvers;
+namespace parallelogram\imgalt\resolvers;
 
 use craft\elements\Asset;
 use craft\elements\Entry;
-use parallelogram\imgalt\\\ImageAlt\resolvers\AssetContextResolverInterface;
+use parallelogram\imgalt\resolvers\AssetContextResolverInterface;
 
 class ProjectContextResolver implements AssetContextResolverInterface
 {

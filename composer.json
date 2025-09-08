@@ -1,5 +1,5 @@
 {
-    "name": "parallelogram-dev/img-alt",
+    "name": "parallelogram/imgalt",
     "description": "A CraftCMS plugin to allow automated alt tag generation for uploaded images, using OpenAI",
     "type": "craft-plugin",
     "license": "proprietary",
@@ -25,11 +25,10 @@
         }
     },
     "extra": {
-        "craft": {
-            "name": "Img Alt",
-            "handle": "img-alt",
-            "class": "parallelogram\\imgalt\\ImgAlt"
-        }
+        "name": "Img Alt",
+        "handle": "imgalt",
+        "class": "parallelogram\\imgalt\\Plugin",
+        "schemaVersion": "1.0.0"
     },
     "config": {
         "allow-plugins": {
