@@ -7,12 +7,13 @@ use craft\console\Controller;
 use craft\elements\Asset;
 use Exception;
 use parallelogram\imgalt\services\AltTextService;
+use Throwable;
 use yii\console\ExitCode;
 
 class AltController extends Controller
 {
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function actionGenerate(): int
     {

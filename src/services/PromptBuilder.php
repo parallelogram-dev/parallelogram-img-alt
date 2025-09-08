@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace parallelogram\imgalt\services;
 
-use Craft;
 use craft\elements\Asset;
-use craft\helpers\FileHelper;
-use craft\helpers\StringHelper;
+use craft\errors\ImageTransformException;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
 use RuntimeException;
+use yii\base\InvalidConfigException;
 
 final class PromptBuilder
 {
@@ -21,7 +20,6 @@ final class PromptBuilder
         return $s;
     }
 
-    // Build the chat payload (unchanged apart from calling dataUrlForAssetUpload())
     public function buildPrompt(Asset $asset, array $context = []): array
     {
         $s = $this->s();
@@ -57,12 +55,15 @@ PROMPT;
         return [
             'model'       => 'gpt-4o',
             'messages'    => [[
-                                  'role'    => 'user',
-                                  'content' => [
-                                      ['type' => 'text', 'text' => $instruction],
-                                      $imagePart,
-                                  ],
-                              ]],
+                'role'    => 'user',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => $instruction
+                    ],
+                    $imagePart,
+                ],
+            ]],
             'temperature' => 0.7,
         ];
     }
@@ -70,26 +71,21 @@ PROMPT;
     /**
      * Make a resized/encoded copy using Craft's Images service and return a data: URL.
      * Falls back to original bytes if transforms aren't requested.
+     *
+     * @throws InvalidConfigException
+     * @throws ImageTransformException
      */
     private function dataUrlForAssetUpload(Asset $asset): string
     {
         $s = $this->s();
 
-        // 1) Read original bytes from the asset's filesystem
         $bytes = $asset->getFs()->read($asset->getPath());
-        if ($bytes == false) {
+        if (! $bytes) {
             throw new RuntimeException("Failed to read bytes for asset #{$asset->id}");
         }
 
-        // 2) If you resized/re-encoded to a temp file earlier, read THAT path
-        //    and set $bytes = file_get_contents($tmpPath); (then unlink)
-        //    BUT do NOT pass $bytes to finfo_file(); it's not a filename.
-
-        // 3) Decide MIME without finfo_file():
-        // Prefer transform format; else try finfo_buffer; else fall back to asset mime.
         $mime = null;
 
-        // (a) From chosen output format (recommended)
         $format = $s->transformFormat ?: '';
         if ($format !== '') {
             $mime = match (strtolower($format)) {
@@ -100,7 +96,6 @@ PROMPT;
             };
         }
 
-        // (b) Try finfo_buffer on the bytes (safe; no filename)
         if ($mime === null && function_exists('finfo_open')) {
             if ($f = finfo_open(FILEINFO_MIME_TYPE)) {
                 $det = finfo_buffer($f, $bytes) ?: null;
@@ -111,7 +106,6 @@ PROMPT;
             }
         }
 
-        // (c) Fall back to Craft's stored mime or a generic default
         $mime ??= $asset->getMimeType() ?: 'application/octet-stream';
 
         return 'data:' . $mime . ';base64,' . base64_encode($bytes);

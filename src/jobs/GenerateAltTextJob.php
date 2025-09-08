@@ -6,6 +6,7 @@ use craft\elements\Asset;
 use craft\errors\ElementNotFoundException;
 use craft\queue\BaseJob;
 use parallelogram\imgalt\services\AltTextService;
+use Throwable;
 use yii\base\Exception;
 
 class GenerateAltTextJob extends BaseJob
@@ -14,7 +15,7 @@ class GenerateAltTextJob extends BaseJob
 
     /**
      * @throws Exception
-     * @throws \Throwable
+     * @throws Throwable
      * @throws ElementNotFoundException
      */
     public function execute($queue): void

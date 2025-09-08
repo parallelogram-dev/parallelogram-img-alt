@@ -11,7 +11,6 @@ use craft\base\Plugin as BasePlugin;
 use craft\elements\Asset;
 use craft\events\DefineHtmlEvent;
 use craft\events\RegisterElementActionsEvent;
-use craft\web\UrlManager;
 use parallelogram\imgalt\elements\actions\GenerateAltTextAction;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\resolvers\ContextResolverManager;
@@ -36,7 +35,7 @@ final class Plugin extends BasePlugin
 
         Craft::setAlias('@imgalt', __DIR__);
 
-        $resolverMap = [];
+        $resolverMap           = [];
         $this->contextResolver = new ContextResolverManager(
             $resolverMap,
             new DefaultResolver()
@@ -59,32 +58,32 @@ final class Plugin extends BasePlugin
 
                 $id         = 'imgalt-sidebar-' . mt_rand();
                 $buttonHtml = <<<HTML
-                    <div class="meta">
-                      <div class="field">
-                        <div class="heading"><label>Img Alt</label></div>
-                        <div class="input ltr">
-                          <button type="button" id="{$id}" class="btn">
-                            <span class="icon" data-icon="sparkles"></span>
-                            Generate ALT text
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+<div class="meta">
+    <div class="field">
+        <div class="heading"><label>Img Alt</label></div>
+        <div class="input ltr">
+            <button type="button" id="{$id}" class="btn">
+                <span class="icon" data-icon="sparkles"></span>
+                Generate ALT text
+            </button>
+        </div>
+    </div>
+</div>
 HTML;
 
                 $e->html .= $buttonHtml;
 
                 Craft::$app->getView()->registerJsWithVars(
                     fn($buttonId, $assetId) => <<<JS
-                $('#'+$buttonId).on('click', async () => {
-                  try {
-                    await Craft.sendActionRequest('POST', 'imgalt/alt/generate', {data:{assetId: $assetId}});
-                    Craft.cp.displaySuccess(Craft.t('imgalt', 'Queued ALT generation.'));
-                  } catch (e) {
-                    const msg = e?.response?.data?.message ?? e?.message ?? 'Request failed';
-                    Craft.cp.displayError(msg);
-                  }
-                });
+$('#'+$buttonId).on('click', async () => {
+    try {
+        await Craft.sendActionRequest('POST', 'imgalt/alt/generate', {data:{assetId: $assetId}});
+        Craft.cp.displaySuccess(Craft.t('imgalt', 'Queued ALT generation.'));
+    } catch (e) {
+        const msg = e?.response?.data?.message ?? e?.message ?? 'Request failed';
+        Craft.cp.displayError(msg);
+    }
+});
 JS,
                     [$id, (int) $asset->id]
                 );

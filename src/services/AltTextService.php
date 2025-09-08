@@ -6,6 +6,7 @@ use craft\elements\Asset;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
 use Throwable;
+use yii\base\InvalidConfigException;
 
 class AltTextService
 {
@@ -16,7 +17,9 @@ class AltTextService
         return $s;
     }
 
-
+    /**
+     * @throws InvalidConfigException
+     */
     public function generateForAsset(Asset $asset): ?string
     {
         $contextResolver = Plugin::getInstance()->contextResolver ?? null;
