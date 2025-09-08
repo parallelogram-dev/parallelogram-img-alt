@@ -6,6 +6,7 @@ use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
 use parallelogram\imgalt\services\PromptBuilder;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class PromptBuilderTest extends TestCase
 {
@@ -31,7 +32,7 @@ final class PromptBuilderTest extends TestCase
 
             public $contextResolver = null;
 
-            public static function getInstance() { return Plugin::$plugin; }
+            public static function getInstance(): Plugin { return Plugin::$plugin; }
         };
     }
 
@@ -44,25 +45,25 @@ final class PromptBuilderTest extends TestCase
 
             public function __construct($url) { $this->url = $url; }
 
-            public function getUrl($transform = null) { return $this->url; }
+            public function getUrl($transform = null): ?string { return $this->url; }
 
-            public function getFs()
+            public function getFs(): object
             {
                 return new class {
-                    public function read($p) { return 'bytes'; }
+                    public function read($p): string { return 'bytes'; }
                 };
             }
 
-            public function getPath($filename = null) { return '/path'; }
+            public function getPath($filename = null): string { return '/path'; }
 
-            public function getMimeType($transform = null) { return 'image/jpeg'; }
+            public function getMimeType($transform = null): string { return 'image/jpeg'; }
         };
     }
 
     public function testBuildPromptWithUrl(): void
     {
         $asset = $this->makeAssetWithUrl('https://example.com/image.jpg');
-        $p     = (new PromptBuilder())->buildPrompt($asset, []);
+        $p     = (new PromptBuilder())->buildPrompt($asset);
         $this->assertSame('gpt-4o', $p['model']);
         $this->assertIsArray($p['messages']);
         $content = $p['messages'][0]['content'];
@@ -77,7 +78,7 @@ final class PromptBuilderTest extends TestCase
         $settings->sendImageAsUpload = true;
 
         $asset   = $this->makeAssetWithUrl(null);
-        $p       = (new PromptBuilder())->buildPrompt($asset, []);
+        $p       = (new PromptBuilder())->buildPrompt($asset);
         $content = $p['messages'][0]['content'];
         $this->assertStringStartsWith('data:image/', $content[1]['image_url']['url']);
         $this->assertStringContainsString(';base64,', $content[1]['image_url']['url']);

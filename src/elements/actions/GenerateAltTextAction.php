@@ -8,6 +8,7 @@ use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\Asset;
+use parallelogram\imgalt\jobs\GenerateAltTextJob;
 use parallelogram\imgalt\Plugin;
 
 final class GenerateAltTextAction extends ElementAction
@@ -23,7 +24,7 @@ final class GenerateAltTextAction extends ElementAction
         $assets = $query->all();
 
         foreach ($assets as $asset) {
-            Craft::$app->getQueue()->push(new \parallelogram\imgalt\jobs\GenerateAltTextJob([
+            Craft::$app->getQueue()->push(new GenerateAltTextJob([
                 'assetId' => (int)$asset->id,
             ]));
         }

@@ -2,6 +2,7 @@
 
 namespace parallelogram\imgalt\console\controllers;
 
+use Craft;
 use craft\console\Controller;
 use craft\elements\Asset;
 use Exception;
@@ -10,6 +11,9 @@ use yii\console\ExitCode;
 
 class AltController extends Controller
 {
+    /**
+     * @throws \Throwable
+     */
     public function actionGenerate(): int
     {
         $assets = Asset::find()
@@ -36,7 +40,7 @@ class AltController extends Controller
 
                 if ($caption) {
                     $asset->alt = $caption;
-                    \Craft::$app->getElements()->saveElement($asset);
+                    Craft::$app->getElements()->saveElement($asset);
                     $this->success("Alt text set: {$caption}");
                 } else {
                     $this->warning("Failed to generate alt text for asset #{$asset->id}");

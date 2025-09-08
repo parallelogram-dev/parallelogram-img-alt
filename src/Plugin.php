@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace parallelogram\imgalt;
 
 use Craft;
+use craft\base\Element;
+use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\elements\Asset;
 use craft\events\DefineHtmlEvent;
@@ -14,7 +16,11 @@ use parallelogram\imgalt\elements\actions\GenerateAltTextAction;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\resolvers\ContextResolverManager;
 use parallelogram\imgalt\resolvers\DefaultResolver;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Event;
+use yii\base\Exception;
 
 final class Plugin extends BasePlugin
 {
@@ -38,7 +44,7 @@ final class Plugin extends BasePlugin
 
         Event::on(
             Asset::class,
-            Asset::EVENT_REGISTER_ACTIONS,
+            Element::EVENT_REGISTER_ACTIONS,
             static function (RegisterElementActionsEvent $e) {
                 $e->actions[] = GenerateAltTextAction::class;
             }
@@ -46,7 +52,7 @@ final class Plugin extends BasePlugin
 
         Event::on(
             Asset::class,
-            Asset::EVENT_DEFINE_SIDEBAR_HTML, // emitted by element types to customize sidebar
+            Element::EVENT_DEFINE_SIDEBAR_HTML, // emitted by element types to customize sidebar
             static function (DefineHtmlEvent $e) {
                 /** @var Asset $asset */
                 $asset = $e->sender;
@@ -91,11 +97,17 @@ JS,
 
     }
 
-    protected function createSettingsModel(): ?\craft\base\Model
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws Exception
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     protected function settingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('imgalt/settings', [

@@ -3,13 +3,20 @@ namespace parallelogram\imgalt\jobs;
 
 use Craft;
 use craft\elements\Asset;
+use craft\errors\ElementNotFoundException;
 use craft\queue\BaseJob;
 use parallelogram\imgalt\services\AltTextService;
+use yii\base\Exception;
 
 class GenerateAltTextJob extends BaseJob
 {
     public int $assetId;
 
+    /**
+     * @throws Exception
+     * @throws \Throwable
+     * @throws ElementNotFoundException
+     */
     public function execute($queue): void
     {
         $asset = Asset::find()->id($this->assetId)->one();

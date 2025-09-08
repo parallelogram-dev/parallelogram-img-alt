@@ -4,6 +4,7 @@ namespace unit;
 
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
+use parallelogram\imgalt\resolvers\AssetContextResolverInterface;
 use parallelogram\imgalt\services\AltTextService;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +14,7 @@ final class AltTextServiceTest extends TestCase
     {
         // Provide Plugin::$plugin with settings and contextResolver stub
         $settings       = new Settings();
-        $resolver       = new class implements \parallelogram\imgalt\resolvers\AssetContextResolverInterface {
+        $resolver       = new class implements AssetContextResolverInterface {
             public function getContextForAsset($asset, mixed $context = null): array { return []; }
         };
         Plugin::$plugin = new class($settings, $resolver) {
@@ -28,7 +29,7 @@ final class AltTextServiceTest extends TestCase
 
             public function getSettings(): Settings { return $this->s; }
 
-            public static function getInstance() { return Plugin::$plugin; }
+            public static function getInstance(): Plugin { return Plugin::$plugin; }
         };
     }
 

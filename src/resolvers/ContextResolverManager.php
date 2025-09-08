@@ -1,10 +1,12 @@
 <?php
 namespace parallelogram\imgalt\resolvers;
 
+use Craft;
 use craft\db\Query;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\elements\MatrixBlock;
+use yii\base\InvalidConfigException;
 
 class ContextResolverManager implements AssetContextResolverInterface
 {
@@ -17,6 +19,9 @@ class ContextResolverManager implements AssetContextResolverInterface
         $this->defaultResolver = $defaultResolver;
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function getContextForAsset(Asset $asset, mixed $context = null): array
     {
         $relatedElementIds = (new Query())
@@ -26,7 +31,7 @@ class ContextResolverManager implements AssetContextResolverInterface
             ->column();
 
         foreach ($relatedElementIds as $elementId) {
-            $element = \Craft::$app->elements->getElementById($elementId);
+            $element = Craft::$app->elements->getElementById($elementId);
 
             if ($element instanceof Entry) {
                 return $this->resolveEntry($element, $asset);

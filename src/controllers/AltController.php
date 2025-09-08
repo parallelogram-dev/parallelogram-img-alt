@@ -14,6 +14,9 @@ class AltController extends Controller
 {
     protected array|int|bool $allowAnonymous = false;
 
+    /**
+     * @throws BadRequestHttpException
+     */
     public function actionGenerate(): Response
     {
         $this->requireCpRequest();

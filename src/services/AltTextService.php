@@ -33,7 +33,7 @@ class AltTextService
         try {
             $client = Craft::createGuzzleClient([
                 'headers' => [
-                    'Authorization' => 'Bearer ' . (string)($settings->openAiApiKey ?? ''),
+                    'Authorization' => 'Bearer ' . ($settings->openAiApiKey ?? ''),
                     'Content-Type' => 'application/json',
                 ],
             ]);

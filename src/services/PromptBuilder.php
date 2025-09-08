@@ -9,6 +9,7 @@ use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
+use RuntimeException;
 
 final class PromptBuilder
 {
@@ -44,7 +45,7 @@ PROMPT;
             ]) ?? $asset->getUrl();
 
             if (! $url) {
-                throw new \RuntimeException('No public URL for this asset. Enable “Send image as upload”.');
+                throw new RuntimeException('No public URL for this asset. Enable “Send image as upload”.');
             }
 
             $imagePart = [
@@ -76,8 +77,8 @@ PROMPT;
 
         // 1) Read original bytes from the asset's filesystem
         $bytes = $asset->getFs()->read($asset->getPath());
-        if ($bytes === false || $bytes === null) {
-            throw new \RuntimeException("Failed to read bytes for asset #{$asset->id}");
+        if ($bytes == false) {
+            throw new RuntimeException("Failed to read bytes for asset #{$asset->id}");
         }
 
         // 2) If you resized/re-encoded to a temp file earlier, read THAT path
