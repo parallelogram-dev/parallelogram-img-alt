@@ -4,98 +4,98 @@
 {% set fullPageForm = true %}
 
 {{ forms.lightswitchField({
-  label: 'Auto-generate on upload'|t('app'),
-  instructions: 'When enabled, the plugin will queue alt-text generation whenever an image is uploaded.'|t('app'),
-  id: 'autoGenerateOnUpload',
-  name: 'autoGenerateOnUpload',
-  on: settings.autoGenerateOnUpload ?? true
+    label: 'Auto-generate on upload'|t('app'),
+    instructions: 'When enabled, the plugin will queue alt-text generation whenever an image is uploaded.'|t('app'),
+    id: 'autoGenerateOnUpload',
+    name: 'autoGenerateOnUpload',
+    on: settings.autoGenerateOnUpload ?? true
 }) }}
 
 {{ forms.autosuggestField({
-  label: 'OpenAI API Key'|t('app'),
-  instructions: 'Supports plain value or an environment variable like {example}.'|t('app')|replace({'{example}':'$OPENAI_API_KEY'}),
-  id: 'openAiApiKey',
-  name: 'openAiApiKey',
-  value: settings.openAiApiKey ?? '',
-  suggestEnvVars: true,
-  placeholder: '$OPENAI_API_KEY'
+    label: 'OpenAI API Key'|t('app'),
+    instructions: 'Supports plain value or an environment variable like {example}.'|t('app')|replace({'{example}':'$OPENAI_API_KEY'}),
+    id: 'openAiApiKey',
+    name: 'openAiApiKey',
+    value: settings.openAiApiKey ?? '',
+    suggestEnvVars: true,
+    placeholder: '$OPENAI_API_KEY'
 }) }}
 
 {{ forms.textField({
-  label: 'Max tokens'|t('app'),
-  instructions: 'Upper bound for a single generation request.'|t('app'),
-  id: 'maxTokens',
-  name: 'maxTokens',
-  value: settings.maxTokens ?? 256,
-  size: 5,
-  type: 'number',
-  min: 1,
-  max: 4000
+    label: 'Max tokens'|t('app'),
+    instructions: 'Upper bound for a single generation request.'|t('app'),
+    id: 'maxTokens',
+    name: 'maxTokens',
+    value: settings.maxTokens ?? 256,
+    size: 5,
+    type: 'number',
+    min: 1,
+    max: 4000
 }) }}
 
 {{ forms.textField({
-  label: 'Language'|t('app'),
-  instructions: 'BCP-47 code to bias generated text (e.g. en, en-AU).'|t('app'),
-  id: 'language',
-  name: 'language',
-  value: settings.language ?? 'en-AU',
-  placeholder: 'en-AU'
+    label: 'Language'|t('app'),
+    instructions: 'BCP-47 code to bias generated text (e.g. en, en-AU).'|t('app'),
+    id: 'language',
+    name: 'language',
+    value: settings.language ?? 'en-AU',
+    placeholder: 'en-AU'
 }) }}
 
 {{ forms.lightswitchField({
-  label: 'Send image as upload'|t('app'),
-  instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
-  id: 'sendImageAsUpload',
-  name: 'sendImageAsUpload',
-  on: settings.sendImageAsUpload ?? false
+    label: 'Send image as upload'|t('app'),
+    instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
+    id: 'sendImageAsUpload',
+    name: 'sendImageAsUpload',
+    on: settings.sendImageAsUpload ?? false
 }) }}
 
 {{ forms.textField({
-  label: 'Max dimension (px)',
-  instructions: 'Longest side of the transformed image.',
-  id: 'transformMaxSize',
-  name: 'transformMaxSize',
-  value: settings.transformMaxSize ?? 1024,
-  type: 'number',
-  min: 64,
-  max: 4096,
-  size: 6
+    label: 'Max dimension (px)',
+    instructions: 'Longest side of the transformed image.',
+    id: 'transformMaxSize',
+    name: 'transformMaxSize',
+    value: settings.transformMaxSize ?? 1024,
+    type: 'number',
+    min: 64,
+    max: 4096,
+    size: 6
 }) }}
 
 {{ forms.selectField({
-  label: 'Resize mode',
-  id: 'transformMode',
-  name: 'transformMode',
-  options: [
-    {label: 'Fit (preserve aspect)', value: 'fit'},
-    {label: 'Crop', value: 'crop'},
-    {label: 'Stretch', value: 'stretch'},
-  ],
-  value: settings.transformMode ?? 'fit'
+    label: 'Resize mode',
+    id: 'transformMode',
+    name: 'transformMode',
+    options: [
+        {label: 'Fit (preserve aspect)', value: 'fit'},
+        {label: 'Crop', value: 'crop'},
+        {label: 'Stretch', value: 'stretch'},
+    ],
+    value: settings.transformMode ?? 'fit'
 }) }}
 
 {{ forms.selectField({
-  label: 'Output format',
-  instructions: 'Choose an output format to reduce size. Leave blank to keep source format.',
-  id: 'transformFormat',
-  name: 'transformFormat',
-  options: [
-    {label: 'JPEG (jpg)', value: 'jpg'},
-    {label: 'PNG (png)', value: 'png'},
-    {label: 'WebP (webp)', value: 'webp'},
-    {label: 'Source format (unchanged)', value: ''},
-  ],
-  value: settings.transformFormat ?? 'jpg'
+    label: 'Output format',
+    instructions: 'Choose an output format to reduce size. Leave blank to keep source format.',
+    id: 'transformFormat',
+    name: 'transformFormat',
+    options: [
+        {label: 'JPEG (jpg)', value: 'jpg'},
+        {label: 'PNG (png)', value: 'png'},
+        {label: 'WebP (webp)', value: 'webp'},
+        {label: 'Source format (unchanged)', value: ''},
+    ],
+    value: settings.transformFormat ?? 'jpg'
 }) }}
 
 {{ forms.textField({
-  label: 'Quality',
-  instructions: 'Applies to lossy formats (jpg/webp).',
-  id: 'transformQuality',
-  name: 'transformQuality',
-  value: settings.transformQuality ?? 82,
-  type: 'number',
-  min: 1,
-  max: 100,
-  size: 4
+    label: 'Quality',
+    instructions: 'Applies to lossy formats (jpg/webp).',
+    id: 'transformQuality',
+    name: 'transformQuality',
+    value: settings.transformQuality ?? 82,
+    type: 'number',
+    min: 1,
+    max: 100,
+    size: 4
 }) }}

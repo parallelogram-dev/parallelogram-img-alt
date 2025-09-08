@@ -1,18 +1,17 @@
 <?php
-
-namespace parallelogram\imgalt\controllers;
+declare(strict_types=1);
 
 namespace parallelogram\imgalt\controllers;
 
 use Craft;
 use craft\web\Controller;
 use craft\elements\Asset;
+use parallelogram\imgalt\jobs\GenerateAltTextJob;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 class AltController extends Controller
 {
-    /** Only CP users; omit/adjust if you want site access too */
     protected array|int|bool $allowAnonymous = false;
 
     public function actionGenerate(): Response
@@ -21,14 +20,13 @@ class AltController extends Controller
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
-        $assetId = (int)Craft::$app->getRequest()->getRequiredBodyParam('assetId');
-        $asset = Asset::find()->id($assetId)->one();
-        if (!$asset) {
+        $assetId = (int) Craft::$app->getRequest()->getRequiredBodyParam('assetId');
+        $asset   = Asset::find()->id($assetId)->one();
+        if (! $asset) {
             throw new BadRequestHttpException("Asset not found.");
         }
 
-        // Queue your job (or call a service)
-        Craft::$app->getQueue()->push(new \parallelogram\imgalt\jobs\GenerateAltTextJob([
+        Craft::$app->getQueue()->push(new GenerateAltTextJob([
             'assetId' => $assetId,
         ]));
 

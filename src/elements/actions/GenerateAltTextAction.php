@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-// src/elements/actions/GenerateAltTextAction.php
-declare(strict_types=1);
-
 namespace parallelogram\imgalt\elements\actions;
 
 use Craft;
@@ -26,14 +23,11 @@ final class GenerateAltTextAction extends ElementAction
         $assets = $query->all();
 
         foreach ($assets as $asset) {
-            // Push your job or call the service directly:
             Craft::$app->getQueue()->push(new \parallelogram\imgalt\jobs\GenerateAltTextJob([
                 'assetId' => (int)$asset->id,
             ]));
-            // Or: Plugin::getInstance()->altText->generateForAsset($asset);
         }
 
-        // Optional confirmation in the CP
         if (method_exists($this, 'setMessage')) {
             $this->setMessage(Craft::t('imgalt', 'Queued ALT generation for {n} asset(s).', [
                 'n' => count($assets),

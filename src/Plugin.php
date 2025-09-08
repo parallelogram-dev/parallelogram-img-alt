@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace parallelogram\imgalt;
 
 use Craft;
@@ -18,8 +20,8 @@ final class Plugin extends BasePlugin
 {
     public static Plugin          $plugin;
     public ContextResolverManager $contextResolver;
-    public bool                   $hasCpSection  = false; // set true if you have a CP nav/section
-    public bool                   $hasCpSettings = true; // set true if you expose settings UI
+    public bool                   $hasCpSection  = false;
+    public bool                   $hasCpSettings = true;
 
     public function init(): void
     {
@@ -28,19 +30,12 @@ final class Plugin extends BasePlugin
 
         Craft::setAlias('@imgalt', __DIR__);
 
-        $settings    = Plugin::$plugin->getSettings();
         $resolverMap = [];
-
-        foreach ($config['resolverMap'] ?? [] as $type => $resolverClass) {
-            $resolverMap[$type] = new $resolverClass();
-        }
-
         $this->contextResolver = new ContextResolverManager(
             $resolverMap,
             new DefaultResolver()
         );
 
-        // Register our element action for Assets
         Event::on(
             Asset::class,
             Asset::EVENT_REGISTER_ACTIONS,

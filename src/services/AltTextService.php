@@ -3,8 +3,9 @@ namespace parallelogram\imgalt\services;
 
 use Craft;
 use craft\elements\Asset;
-use parallelogram\imgalt\services\PromptBuilder;
+use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
+use Throwable;
 
 class AltTextService
 {
@@ -19,7 +20,7 @@ class AltTextService
     public function generateForAsset(Asset $asset): ?string
     {
         $contextResolver = Plugin::getInstance()->contextResolver ?? null;
-        $settings = Plugin::$plugin->getSettings();
+        $settings = Plugin::getInstance()->getSettings();
 
         if (!$contextResolver) {
             Craft::error("Context resolver not available", __METHOD__);
@@ -32,7 +33,7 @@ class AltTextService
         try {
             $client = Craft::createGuzzleClient([
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $settings->openAiApiKey,
+                    'Authorization' => 'Bearer ' . (string)($settings->openAiApiKey ?? ''),
                     'Content-Type' => 'application/json',
                 ],
             ]);
@@ -47,8 +48,7 @@ class AltTextService
             $data = json_decode($body, true);
             
             return trim($data['choices'][0]['message']['content'] ?? '');
-        } catch (\Throwable $e) {
-            echo "OpenAI error: " . $e->getMessage();
+        } catch (Throwable $e) {
             Craft::error("OpenAI error: " . $e->getMessage(), __METHOD__);
             return null;
         }

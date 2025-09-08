@@ -5,7 +5,7 @@ use craft\elements\Asset;
 
 class DefaultResolver implements AssetContextResolverInterface
 {
-    public function getContextForAsset(Asset $asset): array
+    public function getContextForAsset(Asset $asset, mixed $context = null): array
     {
         return [
             'projectName' => null,
