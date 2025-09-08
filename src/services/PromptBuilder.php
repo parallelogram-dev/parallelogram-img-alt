@@ -5,6 +5,7 @@ namespace parallelogram\imgalt\services;
 
 use craft\elements\Asset;
 use craft\errors\ImageTransformException;
+use Craft;
 use parallelogram\imgalt\models\Settings;
 use parallelogram\imgalt\Plugin;
 use RuntimeException;
@@ -24,9 +25,7 @@ final class PromptBuilder
     {
         $s = $this->s();
 
-        $instruction = <<<PROMPT
-Write one short alt text sentence for this image, suitable for accessibility and SEO. Describe the image clearly and concisely. Do not use quotes, colons or semi-colons. Limit to 10–20 words.
-PROMPT;
+        $instruction = Craft::t('imgalt', 'Write one short alt text sentence for this image, suitable for accessibility and SEO. Describe the image clearly and concisely. Do not use quotes, colons or semi-colons. Limit to 10–20 words.');
 
         if ($s->sendImageAsUpload) {
             $imagePart = [
@@ -43,7 +42,7 @@ PROMPT;
             ]) ?? $asset->getUrl();
 
             if (! $url) {
-                throw new RuntimeException('No public URL for this asset. Enable “Send image as upload”.');
+                throw new RuntimeException(Craft::t('imgalt', 'No public URL for this asset. Enable “Send image as upload”.'));
             }
 
             $imagePart = [
@@ -81,7 +80,7 @@ PROMPT;
 
         $bytes = $asset->getFs()->read($asset->getPath());
         if (! $bytes) {
-            throw new RuntimeException("Failed to read bytes for asset #{$asset->id}");
+            throw new RuntimeException(Craft::t('imgalt', 'Failed to read bytes for asset #{id}', ['id' => $asset->id]));
         }
 
         $mime = null;

@@ -1,19 +1,19 @@
 {% import '_includes/forms' as forms %}
 
-{% set title = 'Img Alt — Settings' %}
+{% set title = 'Img Alt — Settings'|t('imgalt') %}
 {% set fullPageForm = true %}
 
 {{ forms.lightswitchField({
-    label: 'Auto-generate on upload'|t('app'),
-    instructions: 'When enabled, the plugin will queue alt-text generation whenever an image is uploaded.'|t('app'),
+    label: 'Auto-generate on upload'|t('imgalt'),
+    instructions: 'When enabled, the plugin will queue alt-text generation whenever an image is uploaded.'|t('imgalt'),
     id: 'autoGenerateOnUpload',
     name: 'autoGenerateOnUpload',
     on: settings.autoGenerateOnUpload ?? true
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'OpenAI API Key'|t('app'),
-    instructions: 'Supports plain value or an environment variable like {example}.'|t('app')|replace({'{example}':'$OPENAI_API_KEY'}),
+    label: 'OpenAI API Key'|t('imgalt'),
+    instructions: 'Supports plain value or an environment variable like {example}.'|t('imgalt')|replace({'{example}':'$OPENAI_API_KEY'}),
     id: 'openAiApiKey',
     name: 'openAiApiKey',
     value: settings.openAiApiKey ?? '',
@@ -22,8 +22,8 @@
 }) }}
 
 {{ forms.textField({
-    label: 'Max tokens'|t('app'),
-    instructions: 'Upper bound for a single generation request.'|t('app'),
+    label: 'Max tokens'|t('imgalt'),
+    instructions: 'Upper bound for a single generation request.'|t('imgalt'),
     id: 'maxTokens',
     name: 'maxTokens',
     value: settings.maxTokens ?? 256,
@@ -34,8 +34,8 @@
 }) }}
 
 {{ forms.textField({
-    label: 'Language'|t('app'),
-    instructions: 'BCP-47 code to bias generated text (e.g. en, en-AU).'|t('app'),
+    label: 'Language'|t('imgalt'),
+    instructions: 'BCP-47 code to bias generated text (e.g. en, en-AU).'|t('imgalt'),
     id: 'language',
     name: 'language',
     value: settings.language ?? 'en-AU',
@@ -43,16 +43,16 @@
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Send image as upload'|t('app'),
-    instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('app'),
+    label: 'Send image as upload'|t('imgalt'),
+    instructions: 'If enabled, the plugin will upload image bytes to OpenAI. If disabled, it will pass a public URL so OpenAI can fetch the image.'|t('imgalt'),
     id: 'sendImageAsUpload',
     name: 'sendImageAsUpload',
     on: settings.sendImageAsUpload ?? false
 }) }}
 
 {{ forms.textField({
-    label: 'Max dimension (px)',
-    instructions: 'Longest side of the transformed image.',
+    label: 'Max dimension (px)'|t('imgalt'),
+    instructions: 'Longest side of the transformed image.'|t('imgalt'),
     id: 'transformMaxSize',
     name: 'transformMaxSize',
     value: settings.transformMaxSize ?? 1024,
@@ -63,34 +63,34 @@
 }) }}
 
 {{ forms.selectField({
-    label: 'Resize mode',
+    label: 'Resize mode'|t('imgalt'),
     id: 'transformMode',
     name: 'transformMode',
     options: [
-        {label: 'Fit (preserve aspect)', value: 'fit'},
-        {label: 'Crop', value: 'crop'},
-        {label: 'Stretch', value: 'stretch'},
+        {label: 'Fit (preserve aspect)'|t('imgalt'), value: 'fit'},
+        {label: 'Crop'|t('imgalt'), value: 'crop'},
+        {label: 'Stretch'|t('imgalt'), value: 'stretch'},
     ],
     value: settings.transformMode ?? 'fit'
 }) }}
 
 {{ forms.selectField({
-    label: 'Output format',
-    instructions: 'Choose an output format to reduce size. Leave blank to keep source format.',
+    label: 'Output format'|t('imgalt'),
+    instructions: 'Choose an output format to reduce size. Leave blank to keep source format.'|t('imgalt'),
     id: 'transformFormat',
     name: 'transformFormat',
     options: [
-        {label: 'JPEG (jpg)', value: 'jpg'},
-        {label: 'PNG (png)', value: 'png'},
-        {label: 'WebP (webp)', value: 'webp'},
-        {label: 'Source format (unchanged)', value: ''},
+        {label: 'JPEG (jpg)'|t('imgalt'), value: 'jpg'},
+        {label: 'PNG (png)'|t('imgalt'), value: 'png'},
+        {label: 'WebP (webp)'|t('imgalt'), value: 'webp'},
+        {label: 'Source format (unchanged)'|t('imgalt'), value: ''},
     ],
     value: settings.transformFormat ?? 'jpg'
 }) }}
 
 {{ forms.textField({
-    label: 'Quality',
-    instructions: 'Applies to lossy formats (jpg/webp).',
+    label: 'Quality'|t('imgalt'),
+    instructions: 'Applies to lossy formats (jpg/webp).'|t('imgalt'),
     id: 'transformQuality',
     name: 'transformQuality',
     value: settings.transformQuality ?? 82,

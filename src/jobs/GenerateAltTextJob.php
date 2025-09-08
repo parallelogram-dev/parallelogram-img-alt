@@ -23,7 +23,7 @@ class GenerateAltTextJob extends BaseJob
         $asset = Asset::find()->id($this->assetId)->one();
 
         if (!$asset) {
-            Craft::warning("Asset ID {$this->assetId} not found.", __METHOD__);
+            Craft::warning(Craft::t('imgalt', 'Asset ID {id} not found.', ['id' => $this->assetId]), __METHOD__);
             return;
         }
 
@@ -34,12 +34,12 @@ class GenerateAltTextJob extends BaseJob
             $asset->alt = $caption;
             Craft::$app->getElements()->saveElement($asset);
         } else {
-            Craft::warning("Failed to generate alt text for asset ID {$this->assetId}", __METHOD__);
+            Craft::warning(Craft::t('imgalt', 'Failed to generate alt text for asset ID {id}', ['id' => $this->assetId]), __METHOD__);
         }
     }
 
     protected function defaultDescription(): ?string
     {
-        return "Generating alt text for asset ID {$this->assetId}";
+        return Craft::t('imgalt', 'Generating alt text for asset ID {id}', ['id' => $this->assetId]);
     }
 }
