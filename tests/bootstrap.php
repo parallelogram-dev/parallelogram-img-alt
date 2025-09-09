@@ -15,6 +15,9 @@ if (!class_exists('AssetStub', false) && class_exists('craft\\elements\\Asset', 
     class_alias('craft\\elements\\Asset', 'AssetStub');
 }
 
+// Minimal ElementQueryInterface stub before Composer autoload to prevent loading real interface
+if (!interface_exists('craft\\elements\\db\\ElementQueryInterface', false)) { interface ElementQueryInterfaceStub { public function all(): array; } class_alias('ElementQueryInterfaceStub', 'craft\\elements\\db\\ElementQueryInterface'); }
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Provide a very small stubbed app with only services we touch in unit tests
