@@ -26,7 +26,14 @@ class AltTextService
     public function generateForAsset(object $asset): ?string
     {
         $plugin = is_object(Plugin::$plugin ?? null) ? Plugin::$plugin : null;
-        $contextResolver = $plugin->contextResolver ?? null;
+        $contextResolver = null;
+        if ($plugin) {
+            if (method_exists($plugin, 'getContextResolver')) {
+                $contextResolver = $plugin->getContextResolver();
+            } elseif (property_exists($plugin, 'contextResolver')) {
+                $contextResolver = $plugin->contextResolver;
+            }
+        }
         $settings = $this->settings();
 
         if (!$contextResolver) {

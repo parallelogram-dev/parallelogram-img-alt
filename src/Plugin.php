@@ -28,6 +28,17 @@ final class Plugin extends BasePlugin
     public bool                   $hasCpSection  = false;
     public bool                   $hasCpSettings = true;
 
+    // Accessor per Craft coding guidelines (getters/setters for component-like deps)
+    public function getContextResolver(): ContextResolverManager
+    {
+        return $this->contextResolver;
+    }
+
+    public function setContextResolver(ContextResolverManager $resolver): void
+    {
+        $this->contextResolver = $resolver;
+    }
+
     public function init(): void
     {
         parent::init();
@@ -36,10 +47,10 @@ final class Plugin extends BasePlugin
         Craft::setAlias('@imgalt', __DIR__);
 
         $resolverMap           = [];
-        $this->contextResolver = new ContextResolverManager(
+        $this->setContextResolver(new ContextResolverManager(
             $resolverMap,
             new DefaultResolver()
-        );
+        ));
 
         Event::on(
             Asset::class,
