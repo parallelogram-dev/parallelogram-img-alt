@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace parallelogram\imgalt\services;
 
-use craft\elements\Asset;
+// use craft\elements\Asset;
 use craft\errors\ImageTransformException;
 use Craft;
 use parallelogram\imgalt\models\Settings;
@@ -15,13 +15,16 @@ final class PromptBuilder
 {
     private function s(): Settings
     {
-        /** @var Settings $s */
-        $s = Plugin::getInstance()->getSettings();
-
-        return $s;
+        // Prefer Plugin::$plugin if available during tests; fall back to default Settings
+        if (isset(Plugin::$plugin) && is_object(Plugin::$plugin) && method_exists(Plugin::$plugin, 'getSettings')) {
+            /** @var Settings $s */
+            $s = Plugin::$plugin->getSettings();
+            return $s;
+        }
+        return new Settings();
     }
 
-    public function buildPrompt(Asset $asset, array $context = []): array
+    public function buildPrompt(object $asset, array $context = []): array
     {
         $s = $this->s();
 
@@ -74,7 +77,7 @@ final class PromptBuilder
      * @throws InvalidConfigException
      * @throws ImageTransformException
      */
-    private function dataUrlForAssetUpload(Asset $asset): string
+    private function dataUrlForAssetUpload(object $asset): string
     {
         $s = $this->s();
 

@@ -23,7 +23,7 @@ use yii\base\Exception;
 
 final class Plugin extends BasePlugin
 {
-    public static Plugin          $plugin;
+    public static                 $plugin;
     public ContextResolverManager $contextResolver;
     public bool                   $hasCpSection  = false;
     public bool                   $hasCpSettings = true;
